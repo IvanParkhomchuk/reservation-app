@@ -53,6 +53,14 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
   async findOneAndDelete(
     filterQuery: FilterQuery<TDocument>,
   ): Promise<TDocument> {
-    return this.model.findOneAndDelete(filterQuery).lean<TDocument>(true);
+    const document = await this.model
+      .findOneAndDelete(filterQuery)
+      .lean<TDocument>(true);
+
+    if (!document) {
+      throw new NotFoundException(`${this.model.modelName} not found`);
+    }
+
+    return document;
   }
 }
